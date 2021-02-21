@@ -117,5 +117,11 @@ export default defineComponent({
   min-width: 200px;
   height: 100vh;
   margin: auto;
+  background: rgb(10, 115, 185);
+  margin: 0;
+  padding: 0;
+}
+body{
+  margin: 0;
 }
 </style>

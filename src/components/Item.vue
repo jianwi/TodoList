@@ -1,7 +1,10 @@
 <template>
   <li class="item-wrap">
-    <input type="checkbox" v-model="isFinished" />
-    {{ todo.name }}
+    <div class="title" >
+      <input type="checkbox" v-model="isFinished" :id="'todo-'+id" />
+      <label :for="'todo-'+id"> {{ todo.name }} </label>
+    </div>
+
     <button @click="handleDelete">删除</button>
   </li>
 </template>
@@ -38,10 +41,33 @@ export default defineComponent({
     return {
       isFinished,
       handleDelete,
+      id
     };
   },
 });
 </script>
 
 <style scope>
+.item-wrap {
+  padding: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 1px 1px 1px rgb(54, 30, 0);
+  margin: 10px 0;
+  color: rgb(84, 175, 236);
+}
+.title{
+    max-width: 200px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
+button{
+    background: rgba(223, 14, 14, 0.445);
+    color: rgb(204, 238, 11);
+    box-shadow: none;
+    border: none;
+    margin-right: 5px;
+}
+
 </style>

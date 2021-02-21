@@ -1,5 +1,7 @@
 <template>
+<ol>
   <item :todo="item" :key="item.id" v-for='item in todos' :updateTodoCompleted='updateTodoCompleted' />
+</ol>
 </template>
 
 <script lang="ts">
@@ -24,5 +26,9 @@ export default defineComponent({
 </script>
 
 <style>
-
+    ol{
+        padding: 10px;
+        list-style: none;
+        background:  rgb(38, 71, 218);
+    }
 </style>

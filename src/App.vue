@@ -1,7 +1,12 @@
 <template class="container">
   <Header @addTodo="handleAddTodo" />
   <List :todos="todos" :updateTodoCompleted="updateTodoCompleted" />
-  <Footer :count="todos.length" :getCompletedCount="getCompletedCount" :checkAll="checkAll" :isAllCompleted="isAllCompleted" />
+  <Footer
+    :count="todos.length"
+    :getCompletedCount="getCompletedCount"
+    :checkAll="checkAll"
+    :isAllCompleted="isAllCompleted"
+  />
 </template>
 
 <script lang="ts">
@@ -9,8 +14,18 @@ import List from "./components/List.vue";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 
-import {Todo} from './type/todo';
-import { defineComponent, onMounted, onUnmounted, provide, reactive, ref, toRaw, toRefs, watch } from "vue";
+import { Todo } from "./type/todo";
+import {
+  defineComponent,
+  onMounted,
+  onUnmounted,
+  provide,
+  reactive,
+  ref,
+  toRaw,
+  toRefs,
+  watch,
+} from "vue";
 import saveUtils from "./utils/storage";
 export default defineComponent({
   name: "app",
@@ -20,23 +35,21 @@ export default defineComponent({
     Footer,
   },
   setup() {
-    const state = reactive<{todos: Todo[]}>({
+    const state = reactive<{ todos: Todo[] }>({
       todos: [],
     });
-    const {getTodo,saveTodo} = saveUtils();
+    const { getTodo, saveTodo } = saveUtils();
     // 初始化
-    onMounted(()=>{
-      state.todos = getTodo()
-    })
+    onMounted(() => {
+      state.todos.push(...getTodo());
+    });
 
     // 添加 Todo
     function handleAddTodo(arg: string): void {
       state.todos.unshift({ id: Date.now(), name: arg, isCompleted: false });
-      saveTodo(state.todos)
     }
     // 更新 Todo 的完成状态
     function updateTodoCompleted(id: number, val: boolean) {
-      console.log(toRaw(id),val)
       const updatedTodo = state.todos.find((item) => item.id === toRaw(id));
       if (updatedTodo) {
         updatedTodo.isCompleted = val;
@@ -45,9 +58,11 @@ export default defineComponent({
 
     // 删除 Todo
     function deleteTodo(id: number): void {
-      console.log("调用我啦");
-      console.log(id);
-      state.todos = state.todos.filter((item) => item.id !== id);
+      state.todos.forEach((item, index) => {
+        if (item.id === id) {
+          state.todos.splice(index, 1);
+        }
+      });
     }
     provide("deleteTodo", deleteTodo);
 
@@ -59,27 +74,28 @@ export default defineComponent({
     }
     // checkAll
     function checkAll(isCheck: boolean) {
-        if(isCheck){
-          state.todos.forEach(item=>{
-            item.isCompleted = true
-          })
-        }else{
-          state.todos.forEach(item=>{
-            item.isCompleted = false
-          })
-        }
+      if (isCheck) {
+        state.todos.forEach((item) => {
+          item.isCompleted = true;
+        });
+      } else {
+        state.todos.forEach((item) => {
+          item.isCompleted = false;
+        });
+      }
     }
 
-    const isAllCompleted = ref(false)
-    // 观察 todo 是否全完成咯
-    watch(state.todos,function(){
-      if(state.todos.find(item=>item.isCompleted === false)){
-        isAllCompleted.value = false
-      }else{
-        isAllCompleted.value = true
+    const isAllCompleted = ref(false);
+    // 观察 todo
+    watch(state.todos, function () {
+      // console.log("todo观察");
+      if (state.todos.find((item) => item.isCompleted === false)) {
+        isAllCompleted.value = false;
+      } else {
+        isAllCompleted.value = true;
       }
-
-    })
+      saveTodo(state.todos);
+    });
 
     return {
       ...toRefs(state),
@@ -88,7 +104,7 @@ export default defineComponent({
       deleteTodo,
       getCompletedCount,
       checkAll,
-      isAllCompleted
+      isAllCompleted,
     };
   },
 });

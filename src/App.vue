@@ -9,7 +9,9 @@ import List from "./components/List.vue";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 
-import { defineComponent, provide, reactive, ref, toRaw, toRefs, watch } from "vue";
+import {Todo} from './type/todo';
+import { defineComponent, onMounted, onUnmounted, provide, reactive, ref, toRaw, toRefs, watch } from "vue";
+import saveUtils from "./utils/storage";
 export default defineComponent({
   name: "app",
   components: {
@@ -18,16 +20,19 @@ export default defineComponent({
     Footer,
   },
   setup() {
-    const state = reactive({
-      todos: [
-        { id: 1, name: "学习", isCompleted: false },
-        { id: 2, name: "上网", isCompleted: false },
-        { id: 3, name: "打游戏", isCompleted: false },
-      ],
+    const state = reactive<{todos: Todo[]}>({
+      todos: [],
     });
+    const {getTodo,saveTodo} = saveUtils();
+    // 初始化
+    onMounted(()=>{
+      state.todos = getTodo()
+    })
+
     // 添加 Todo
     function handleAddTodo(arg: string): void {
       state.todos.unshift({ id: Date.now(), name: arg, isCompleted: false });
+      saveTodo(state.todos)
     }
     // 更新 Todo 的完成状态
     function updateTodoCompleted(id: number, val: boolean) {
